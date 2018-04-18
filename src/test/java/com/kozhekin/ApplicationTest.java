@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -110,7 +109,7 @@ public class ApplicationTest {
     }
 
     @Test
-    public void testStress() throws InterruptedException, ExecutionException {
+    public void testStress() throws InterruptedException {
         final int tries = 10000;
         double amount = tries + 10.;
         final int size = 100;
@@ -124,14 +123,11 @@ public class ApplicationTest {
         Assert.assertEquals("Sum amount is not correct", accountsBefore.size() * amount, total, 0.001);
         final Random r = new Random(0);
         final ExecutorService exec = Executors.newFixedThreadPool(32);
-        final ThreadLocal<ApplicationClient> client = new ThreadLocal<ApplicationClient>() {
-            @Override
-            protected ApplicationClient initialValue() {
-                final ResteasyClient client = new ResteasyClientBuilder().build();
-                final ResteasyWebTarget target = client.target("http://localhost:8081");
-                return target.proxy(ApplicationClient.class);
-            }
-        };
+        final ThreadLocal<ApplicationClient> client = ThreadLocal.withInitial(() -> {
+            final ResteasyClient client1 = new ResteasyClientBuilder().build();
+            final ResteasyWebTarget target = client1.target("http://localhost:8081");
+            return target.proxy(ApplicationClient.class);
+        });
         long startTime = System.currentTimeMillis();
         int count = 0;
         for (int i = 0; i < tries; ++i) {

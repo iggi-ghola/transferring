@@ -29,7 +29,7 @@ public class Hibernate {
         }
         final Session s = sessionFactory.getCurrentSession();
         s.beginTransaction();
-        s.createSQLQuery("RUNSCRIPT FROM 'classpath:h2-init.sql'").executeUpdate();
+        s.createNativeQuery("RUNSCRIPT FROM 'classpath:h2-init.sql'").executeUpdate();
         s.getTransaction().commit();
     }
 

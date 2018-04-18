@@ -38,7 +38,7 @@ public class Launcher {
         destroyed = true;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         final Launcher launcher = new Launcher();
         launcher.launch();
         Runtime.getRuntime().addShutdownHook(new Thread(launcher::shutdown));
