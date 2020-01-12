@@ -5,37 +5,58 @@ apply plugin: 'java'
 apply plugin: 'application'
 
 sourceCompatibility = 1.8
-mainClassName = "com.kozhekin.Launcher"
+mainClassName = "com.kozhekin.transferring.Launcher"
 
 repositories {
     mavenCentral()
 }
 ext {
-    undertow_version = '2.0.4.Final'
-    slf4j_version = '1.7.25'
-    log4j_version = '1.2.17'
-    resteasy_version = '3.5.0.Final'
-    hibernate_version = '5.2.16.Final'
-    h2_version = 'h2:1.4.197'
+    undertow_version = '2.0.29.Final'
+    slf4j_version = '1.7.30'
+    logback_version = '1.2.3'
+    resteasy_version = '3.9.0.Final'
 }
 
 dependencies {
-    compile "io.undertow:undertow-core:$undertow_version"
-    compile "io.undertow:undertow-servlet:$undertow_version"
+    implementation "io.undertow:undertow-core:$undertow_version"
+    implementation "io.undertow:undertow-servlet:$undertow_version"
 
-    compile "org.jboss.resteasy:resteasy-jaxrs:$resteasy_version"
-    compile "org.jboss.resteasy:resteasy-jackson-provider:$resteasy_version"
-    compile "org.jboss.resteasy:resteasy-undertow:$resteasy_version"
+    implementation "org.jboss.resteasy:resteasy-jaxrs:$resteasy_version"
+    implementation "org.jboss.resteasy:resteasy-jackson-provider:$resteasy_version"
+    implementation "org.jboss.resteasy:resteasy-undertow:$resteasy_version"
 
-    compile group: 'org.slf4j', name: 'slf4j-api', version: slf4j_version
-    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: slf4j_version
-    compile group: 'log4j', name: 'log4j', version: log4j_version
-    compile group: 'log4j', name: 'apache-log4j-extras', version: log4j_version
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4j_version
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: logback_version
 
-    compile "com.h2database:$h2_version"
-    compile "org.hibernate:hibernate-core:$hibernate_version"
+//    implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
 
-    testCompile "org.jboss.resteasy:resteasy-client:$resteasy_version"
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile "org.openjdk.jmh:jmh-core:1.20"
+    testImplementation "org.jboss.resteasy:resteasy-client:$resteasy_version"
+    testImplementation group: 'junit', name: 'junit', version: '4.13'
+}
+
+test {
+    useJUnit {
+        excludeCategories(
+                'com.kozhekin.transferring.category.SlowTest',
+                'com.kozhekin.transferring.category.StressTest')
+    }
+}
+
+task slowTests(type: Test) {
+    useJUnit {
+        includeCategories('com.kozhekin.transferring.category.SlowTest')
+    }
+}
+
+task allTests(type: Test) {
+    useJUnit {
+        excludeCategories('com.kozhekin.transferring.category.StressTest')
+    }
+}
+
+task stressTests(type: Test) {
+    systemProperty "stress.time.minutes", System.getProperty("stress.time.minutes")
+    useJUnit {
+        includeCategories('com.kozhekin.transferring.category.StressTest')
+    }
 }
