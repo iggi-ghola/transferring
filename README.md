@@ -27,4 +27,15 @@ gradlew run
 to run application from sources
 
 What would be better in this code:
--
+- REST is not good enough: ERROR codes are always 5XX.
+- REST is not good enough in terms of methods and URIs:
+```
+@GET
+@Path("/account/list")
+``` 
+and
+```
+@PUT
+@Path("/account/create")
+```
+- Big coupling of logics, DAO classes have validation and money transfer checks.
